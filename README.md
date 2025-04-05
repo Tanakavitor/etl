@@ -27,7 +27,7 @@ Após isso, foram criadas duas funções utilizando *pattern matching*. Essas fu
 
 Com a lista order agora contendo apenas os pedidos que o usuário desejava, partimos para manipular o order_item, que já havia passado por um filtro para transformar cada linha em registros (`records`). Para isso, foi criada uma função que filtrava o order_item, mantendo apenas os itens cujos IDs estavam presentes na lista de pedidos order filtrada.
 
-Tendo essa lista, foi necessário agrupar os pedidos por ID, somando os valores totais e as taxas acumuladas. Para isso, foi criada uma função específica, denominada `calculate_totals_per_order`, responsável por realizar esse processamento. Essa função foi desenvolvida com o auxílio de ferramentas de IA que também foi utilizada para gerar um arquivo CSV de saída contendo os resultados consolidados alem de correção de alguns erros e ajuda no texto do readme.
+Tendo essa lista, foi necessário agrupar os pedidos por ID, somando os valores totais e as taxas acumuladas. Para isso, foi criada uma função específica, denominada `calculate_totals_per_order`, responsável por realizar esse processamento. Essa função foi desenvolvida com o auxílio de ferramentas de IA que também foi utilizada para correção de alguns erros e ajuda no texto do readme.
 
 Com o código já funcionando, a última etapa consistiu em "limpar o código". No bloco `let () =`, as variáveis estavam realizando muitas operações diretamente na linha. Para melhorar a estrutura, essas operações foram retiradas e transformadas em funções auxiliares e colocadas em cima, deixando o código mais organizado e modular.
 
