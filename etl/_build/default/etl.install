@@ -1,0 +1,8 @@
+lib: [
+  "_build/install/default/lib/etl/META"
+  "_build/install/default/lib/etl/dune-package"
+  "_build/install/default/lib/etl/opam"
+]
+bin: [
+  "_build/install/default/bin/etl.exe"
+]
