@@ -1,11 +1,10 @@
-(* Definição dos tipos *)
+(* Records *)
 type order = { id : int; status : string; origin : string }
 type order_item = { order_id : int; preco_total : float; total_taxes : float }
 type totals = { preco_total : float; total_taxes : float }
 
-(* ============================ FUNÇÕES PURAS ============================ *)
+(* Funcoes Puras *)
 
-(* Função para parsear uma linha de pedido (order) - apenas campos necessários *)
 let parse_order line = 
   match line with
   | [id; _client_id; _order_date; status; origin] -> 
@@ -14,7 +13,6 @@ let parse_order line =
         origin }
   | _ -> failwith "Formato Invalido"
 
-(* Função para parsear uma linha de item de pedido (order_item) - apenas campos necessários *)
 let parse_order_item line =
   match line with
   | [order_id; _product_id; quantity; price; tax] ->
@@ -26,7 +24,6 @@ let parse_order_item line =
         total_taxes = tax *. (float_of_int quantity *. price) }
   | _ -> failwith "Formato Invalido"
 
-(* Função para calcular os totais por pedido *)
 let calculate_totals_per_order items =
   List.fold_left (fun acc item ->
     let current_total = 
@@ -42,7 +39,6 @@ let calculate_totals_per_order items =
   ) [] items
   |> List.sort (fun (id1, _) (id2, _) -> compare id1 id2)
 
-(* Função para criar linhas CSV *)
 let create_rows lista = ["Order ID"; "Total Price"; "Total Taxes"] ::
   List.map (fun (order_id, total) ->
     [string_of_int order_id; 
@@ -50,65 +46,46 @@ let create_rows lista = ["Order ID"; "Total Price"; "Total Taxes"] ::
      Printf.sprintf "%.2f" total.total_taxes]
   ) lista
 
-(* Função para filtrar pedidos por status *)
 let filter_orders_by_status orders status =
   match status with
   | "all" -> orders
   | _ -> List.filter (fun order -> order.status = status) orders
 
-(* Função para filtrar pedidos por origem *)
 let filter_orders_by_origin orders origin =
   match origin with
   | "all" -> orders
   | _ -> List.filter (fun order -> order.origin = origin) orders
 
-(* Função para filtrar itens de pedido pelos IDs dos pedidos *)
 let filter_order_items_by_ids order_items order_ids =
   List.filter (fun item -> List.mem item.order_id order_ids) order_items
 
-(* Função para remover o cabeçalho de uma lista *)
 let remove_header lines =
   match lines with
   | [] -> []
   | _ :: t -> t
 
-(* ============================ FUNÇÕES IMPURAS ============================ *)
+(* Funcos Impuras *)
 
-(* Função para ler input do usuário *)
-let printar_e_ler msg = 
+let print_and_read msg = 
   Printf.printf "%s" msg; 
   read_line ()
 
-(* Função principal - função impura que orquestra o programa *)
 let () =
-  (* Lê e processa o arquivo de pedidos (orders) *)
   let csv_path_orders = "data/order.csv" in
   let lines_orders = Csv.load csv_path_orders in
   let lines_orders = remove_header lines_orders in 
   let orders = List.map parse_order lines_orders in 
-
-  (* Lê e processa o arquivo de itens de pedido (order_items) *)
   let csv_path_items = "data/order_item.csv" in
   let lines_items = Csv.load csv_path_items in
   let lines_items = remove_header lines_items in  
   let order_items = List.map parse_order_item lines_items in
-
-  (* Lê os filtros do usuário *)
-  let status = printar_e_ler "Digite o status do pedido 'Complete', 'Pending', 'Cancelled' ou 'all': " in
-  let origin = printar_e_ler "Digite a origem do pedido 'O', 'P' ou 'all': " in
-
-  (* Aplica os filtros *)
+  let status = print_and_read "Digite o status do pedido 'Complete', 'Pending', 'Cancelled' ou 'all': " in
+  let origin = print_and_read "Digite a origem do pedido 'O', 'P' ou 'all': " in
   let filtered_orders = filter_orders_by_status orders status in
   let filtered_orders = filter_orders_by_origin filtered_orders origin in 
-
-  (* Filtra os itens de pedido *)
   let order_ids = List.map (fun order -> order.id) filtered_orders in
   let filtered_order_items = filter_order_items_by_ids order_items order_ids in
-
-  (* Calcula os totais por pedido *)
   let totals_per_order = calculate_totals_per_order filtered_order_items in
   let csv_rows = create_rows totals_per_order in
-
-  (* Salva o arquivo de saída *)
   let output_csv_path = "output/totals.csv" in
   Csv.save output_csv_path csv_rows

@@ -66,7 +66,7 @@ let remove_header lines =
 
 (* Funcos Impuras *)
 
-let printar_e_ler msg = 
+let print_and_read msg = 
   Printf.printf "%s" msg; 
   read_line ()
 
@@ -79,8 +79,8 @@ let () =
   let lines_items = Csv.load csv_path_items in
   let lines_items = remove_header lines_items in  
   let order_items = List.map parse_order_item lines_items in
-  let status = printar_e_ler "Digite o status do pedido 'Complete', 'Pending', 'Cancelled' ou 'all': " in
-  let origin = printar_e_ler "Digite a origem do pedido 'O', 'P' ou 'all': " in
+  let status = print_and_read "Digite o status do pedido 'Complete', 'Pending', 'Cancelled' ou 'all': " in
+  let origin = print_and_read "Digite a origem do pedido 'O', 'P' ou 'all': " in
   let filtered_orders = filter_orders_by_status orders status in
   let filtered_orders = filter_orders_by_origin filtered_orders origin in 
   let order_ids = List.map (fun order -> order.id) filtered_orders in
